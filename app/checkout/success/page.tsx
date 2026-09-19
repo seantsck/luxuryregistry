@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { retrieveStripeCheckoutSession } from "@/lib/stripe";
 
-type Props = { searchParams: Promise<{ session_id?: string }> };
+type Props = {
+  searchParams: Promise<{ session_id?: string; mode?: string }>;
+};
 
 export default async function CheckoutSuccessPage({ searchParams }: Props) {
-  const { session_id } = await searchParams;
+  const { session_id, mode } = await searchParams;
 
   if (!session_id) {
     return (
@@ -18,7 +20,8 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   }
 
   try {
-    const session = await retrieveStripeCheckoutSession(session_id);
+    const stripeMode = mode === "test" ? "test" : "live";
+    const session = await retrieveStripeCheckoutSession(session_id, stripeMode);
     const paid = session.payment_status === "paid";
 
     return (

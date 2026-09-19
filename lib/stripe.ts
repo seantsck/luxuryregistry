@@ -11,7 +11,7 @@ export async function createStripeCheckoutSession(
   quantity = 1,
   size?: string,
 ) {
-  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://luxuryregistry.vercel.app").replace(/\/$/, "");
+  const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://luxuryregistry.io").replace(/\/$/, "");
   const body = new URLSearchParams();
 
   body.set("mode", "payment");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Product } from "@/lib/products";
+import type { Product } from "@/lib/product-types";
 import { ProductCard } from "@/components/product-card";
 
 export function CatalogBrowser({ products }: { products: Product[] }) {
@@ -23,7 +23,7 @@ export function CatalogBrowser({ products }: { products: Product[] }) {
         <label><span>Department</span><select value={department} onChange={e=>setDepartment(e.target.value)}>{["All","Tops","Outerwear","Denim","Footwear","Bags"].map(x=><option key={x}>{x}</option>)}</select></label>
         <label><span>Order</span><select value={sort} onChange={e=>setSort(e.target.value)}><option value="registry">Registry no.</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="name">Name</option></select></label>
       </div>
-      <div className="catalog-meta"><span>{visible.length} preview registrations</span><span>625 cataloged · commerce disabled</span></div>
+      <div className="catalog-meta"><span>{visible.length} registrations</span><span>625 cataloged · verification-gated commerce</span></div>
       <div className="product-grid">{visible.map(p=><ProductCard key={p.id} product={p} />)}</div>
     </>
   );

@@ -80,16 +80,20 @@ async function saveOrder(session: any) {
 }
 
 export async function POST(request: NextRequest) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+  const liveSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+  const testSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET?.trim();
   const signature = request.headers.get("stripe-signature");
 
-  if (!secret || !signature) {
+  if ((!liveSecret && !testSecret) || !signature) {
     return NextResponse.json({ error: "Webhook is not configured." }, { status: 503 });
   }
 
   const payload = await request.text();
+  const valid =
+    (liveSecret ? verifyStripeSignature(payload, signature, liveSecret) : false) ||
+    (testSecret ? verifyStripeSignature(payload, signature, testSecret) : false);
 
-  if (!verifyStripeSignature(payload, signature, secret)) {
+  if (!valid) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 

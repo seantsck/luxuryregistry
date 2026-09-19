@@ -21,6 +21,7 @@ export type Product = {
   channelReady?: boolean;
   buyable?: boolean;
   checkoutUrl?: string;
+  shopifyVariantId?: string;
   gtin?: string;
   mpn?: string;
   identifierExists?: boolean;

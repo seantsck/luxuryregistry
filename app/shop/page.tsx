@@ -14,7 +14,7 @@ export default async function ShopPage() {
       <div className="shop-intro">
         <p className="eyebrow">THE REGISTER · 625 CATALOGED OBJECTS</p>
         <h1>Index of objects.</h1>
-        <p>The reconciled master catalog is live. Commerce remains verification-gated: a listing becomes purchasable only after its documentation, product data, imagery and Shopify variant are cleared.</p>
+        <p>The reconciled master catalog is live. Commerce remains verification-gated: a listing becomes purchasable only after its documentation, product data, imagery and Stripe checkout requirements are cleared.</p>
       </div>
       <CatalogBrowser products={products} />
     </main>

@@ -36,7 +36,7 @@ function verifyStripeSignature(payload: string, signatureHeader: string, secret:
 
 async function saveOrder(session: any) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const serviceKey = process.env.SUPABASE_SECRET_KEY?.trim();
 
   if (!supabaseUrl || !serviceKey) {
     console.warn("Supabase order persistence is not configured.");
@@ -65,7 +65,6 @@ async function saveOrder(session: any) {
       method: "POST",
       headers: {
         apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
         "Content-Type": "application/json",
         Prefer: "resolution=merge-duplicates,return=minimal",
       },

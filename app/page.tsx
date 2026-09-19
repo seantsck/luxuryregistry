@@ -18,11 +18,11 @@ export default function Home() {
         <div><strong>625</strong><span>cataloged objects</span></div>
         <div><strong>1,236</strong><span>source images mapped</span></div>
         <div><strong>05</strong><span>core departments</span></div>
-        <div><strong>20</strong><span>preview registrations</span></div>
+        <div><strong>625</strong><span>registrations loaded</span></div>
       </section>
 
       <section className="editorial-section">
-        <div className="section-heading"><div><span className="section-no">01</span><p>PREVIEW REGISTRATIONS</p></div><h2>The edit.</h2><Link href="/shop">View preview →</Link></div>
+        <div className="section-heading"><div><span className="section-no">01</span><p>NEW REGISTRATIONS</p></div><h2>The edit.</h2><Link href="/shop">View the register →</Link></div>
         <div className="featured-grid">{products.slice(0,8).map(p=><ProductCard key={p.id} product={p} />)}</div>
       </section>
 

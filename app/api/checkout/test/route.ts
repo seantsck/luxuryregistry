@@ -33,7 +33,7 @@ export async function GET() {
 
   const body = new URLSearchParams();
   body.set("mode", "payment");
-  body.set("success_url", `${site}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
+  body.set("success_url", `${site}/checkout/success?session_id={CHECKOUT_SESSION_ID}&mode=test`);
   body.set("cancel_url", `${site}/checkout/test`);
   body.set("customer_creation", "always");
   body.set("billing_address_collection", "auto");

@@ -8,5 +8,5 @@ export function siteUrl() {
   const deployment = process.env.VERCEL_URL?.trim();
   if (deployment) return `https://${deployment.replace(/\/$/, "")}`;
 
-  return "http://localhost:3000";
+  return "https://luxuryregistry.io";
 }

@@ -54,3 +54,27 @@ export async function createStripeCheckoutSession(
   if (!payload?.url) throw new Error("Stripe did not return a Checkout URL.");
   return payload.url as string;
 }
+
+
+export async function retrieveStripeCheckoutSession(sessionId: string) {
+  const response = await fetch(
+    `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+    {
+      headers: { Authorization: `Bearer ${stripeSecretKey()}` },
+      cache: "no-store",
+    },
+  );
+
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload?.error?.message || `Stripe returned ${response.status}.`);
+  }
+  return payload as {
+    id: string;
+    payment_status?: string;
+    customer_details?: { email?: string | null; name?: string | null } | null;
+    metadata?: Record<string, string>;
+    amount_total?: number | null;
+    currency?: string | null;
+  };
+}

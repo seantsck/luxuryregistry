@@ -9,6 +9,20 @@ export type Product = {
   compareAt?: number;
   colors: string;
   short: string;
+
+  // Sales-channel fields are intentionally optional. A product is exported
+  // only when verification, checkout, imagery, identifiers, and size data
+  // are complete enough for marketplace ingestion.
+  image?: string;
+  sizes?: string[];
+  gender?: "unisex" | "male" | "female";
+  availability?: "in stock" | "out of stock" | "preorder";
+  verified?: boolean;
+  channelReady?: boolean;
+  buyable?: boolean;
+  gtin?: string;
+  mpn?: string;
+  identifierExists?: boolean;
 };
 
 export const products: Product[] = [

@@ -47,10 +47,7 @@ export default async function ProductPage({ params }: Props) {
     },
   } : null;
 
-  const checkoutHref =
-    commerceReady && product.shopifyVariantId
-      ? `/api/checkout?variant=${encodeURIComponent(product.shopifyVariantId)}`
-      : null;
+  const checkoutEnabled = commerceReady;
 
   return (
     <main className="product-page">
@@ -103,8 +100,20 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
 
-          {checkoutHref ? (
-            <Link className="disabled-buy" href={checkoutHref}>BUY NOW</Link>
+          {checkoutEnabled ? (
+            <form action="/api/checkout" method="GET">
+              <input type="hidden" name="product" value={product.id} />
+              {product.sizes?.length ? (
+                <label style={{ display:"grid", gap:8, marginBottom:14 }}>
+                  <span className="eyebrow">SIZE</span>
+                  <select name="size" required defaultValue="">
+                    <option value="" disabled>Select size</option>
+                    {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
+                  </select>
+                </label>
+              ) : null}
+              <button className="disabled-buy" type="submit">BUY NOW</button>
+            </form>
           ) : (
             <button className="disabled-buy" disabled>NOT YET AVAILABLE FOR PURCHASE</button>
           )}

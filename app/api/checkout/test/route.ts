@@ -10,7 +10,21 @@ export async function GET() {
     return NextResponse.json({ error: "Stripe is not configured." }, { status: 503 });
   }
 
-  if (!key.startsWith("sk_test_")) {
+  const modeCheck = await fetch("https://api.stripe.com/v1/balance", {
+    headers: { Authorization: `Bearer ${key}` },
+    cache: "no-store",
+  });
+
+  const modePayload = await modeCheck.json();
+
+  if (!modeCheck.ok) {
+    return NextResponse.json(
+      { error: modePayload?.error?.message || "Stripe API key could not be verified." },
+      { status: 502 },
+    );
+  }
+
+  if (modePayload?.livemode !== false) {
     return NextResponse.json(
       { error: "Test checkout is disabled because Stripe is not in test mode." },
       { status: 403 },

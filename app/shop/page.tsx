@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import { CatalogBrowser } from "@/components/catalog-browser";
 import { products } from "@/lib/products";
 
-export const metadata: Metadata = { title:"The Register", description:"Browse the Luxury Registry private catalog preview." };
+export const metadata: Metadata = {
+  title:"The Register",
+  description:"Browse all 625 cataloged Luxury Registry objects."
+};
 
 export default function ShopPage() {
   return (
     <main className="shop-page">
       <div className="shop-intro">
-        <p className="eyebrow">THE REGISTER · PRIVATE PREVIEW</p>
+        <p className="eyebrow">THE REGISTER · 625 CATALOGED OBJECTS</p>
         <h1>Index of objects.</h1>
-        <p>Twenty representative registrations are live in this first build. The reconciled master contains 625 products and will move into the database after the storefront shell is approved.</p>
+        <p>The reconciled master catalog is live. Commerce remains verification-gated: a listing becomes purchasable only after its documentation, product data, imagery and Shopify variant are cleared.</p>
       </div>
       <CatalogBrowser products={products} />
     </main>

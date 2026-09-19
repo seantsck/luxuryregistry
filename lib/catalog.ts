@@ -61,7 +61,6 @@ export async function loadCatalog(): Promise<Product[]> {
       {
         headers: {
           apikey: key,
-          Authorization: `Bearer ${key}`,
         },
         next: { revalidate: 60 },
       },

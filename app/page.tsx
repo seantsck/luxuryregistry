@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 
-export default function Home() {
+export default async function Home() {
+  const products = await loadCatalog();
   return (
     <main>
       <section className="hero">

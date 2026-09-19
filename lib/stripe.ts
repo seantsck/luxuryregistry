@@ -1,8 +1,21 @@
 import type { Product } from "./product-types";
 
-function stripeSecretKey() {
-  const key = process.env.STRIPE_SECRET_KEY?.trim();
-  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured.");
+type StripeMode = "live" | "test";
+
+function stripeSecretKey(mode: StripeMode = "live") {
+  const key =
+    mode === "test"
+      ? process.env.STRIPE_TEST_SECRET_KEY?.trim()
+      : process.env.STRIPE_SECRET_KEY?.trim();
+
+  if (!key) {
+    throw new Error(
+      mode === "test"
+        ? "STRIPE_TEST_SECRET_KEY is not configured."
+        : "STRIPE_SECRET_KEY is not configured.",
+    );
+  }
+
   return key;
 }
 
@@ -40,7 +53,7 @@ export async function createStripeCheckoutSession(
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${stripeSecretKey()}`,
+      Authorization: `Bearer ${stripeSecretKey("live")}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body,
@@ -57,12 +70,14 @@ export async function createStripeCheckoutSession(
   return payload.url as string;
 }
 
-
-export async function retrieveStripeCheckoutSession(sessionId: string) {
+export async function retrieveStripeCheckoutSession(
+  sessionId: string,
+  mode: StripeMode = "live",
+) {
   const response = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
     {
-      headers: { Authorization: `Bearer ${stripeSecretKey()}` },
+      headers: { Authorization: `Bearer ${stripeSecretKey(mode)}` },
       cache: "no-store",
     },
   );

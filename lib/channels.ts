@@ -1,10 +1,10 @@
-import type { Product } from "./products";
+import type { Product } from "./product-types";
 
 export type ChannelIssue =
   | "verification-pending"
   | "channel-disabled"
   | "checkout-disabled"
-  | "missing-checkout-url"
+  | "missing-shopify-variant"
   | "missing-image"
   | "missing-price"
   | "missing-color"
@@ -38,7 +38,7 @@ export function channelIssues(product: Product): ChannelIssue[] {
   if (!product.verified) issues.push("verification-pending");
   if (!product.channelReady) issues.push("channel-disabled");
   if (!product.buyable) issues.push("checkout-disabled");
-  if (!product.checkoutUrl) issues.push("missing-checkout-url");
+  if (!product.shopifyVariantId) issues.push("missing-shopify-variant");
   if (!product.image) issues.push("missing-image");
   if (!product.price || product.price <= 0) issues.push("missing-price");
   if (!product.colors?.trim()) issues.push("missing-color");

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProduct, products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 import { money } from "@/lib/format";
 import { isChannelReady } from "@/lib/channels";
 import { siteUrl } from "@/lib/site";
@@ -10,13 +10,15 @@ type Props = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
-  const product = getProduct(handle);
+  const products = await loadCatalog();
+  const product = products.find((item) => item.handle === handle);
   return product ? { title: product.title, description: product.short } : {};
 }
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  const products = await loadCatalog();
+  const product = products.find((item) => item.handle === handle);
   if (!product) notFound();
 
   const index = products.findIndex((p) => p.handle === handle);

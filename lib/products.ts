@@ -19,7 +19,9 @@ export type Product = {
   availability?: "in stock" | "out of stock" | "preorder";
   verified?: boolean;
   channelReady?: boolean;
-  buyable?: boolean;\n  checkoutUrl?: string;\n  gtin?: string;
+  buyable?: boolean;
+  checkoutUrl?: string;
+  gtin?: string;
   mpn?: string;
   identifierExists?: boolean;
 };

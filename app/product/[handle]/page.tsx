@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProduct, products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 import { money } from "@/lib/format";
 import { isChannelReady } from "@/lib/channels";
 import { siteUrl } from "@/lib/site";
@@ -10,13 +10,15 @@ type Props = { params: Promise<{ handle: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
-  const product = getProduct(handle);
+  const products = await loadCatalog();
+  const product = products.find((item) => item.handle === handle);
   return product ? { title: product.title, description: product.short } : {};
 }
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
-  const product = getProduct(handle);
+  const products = await loadCatalog();
+  const product = products.find((item) => item.handle === handle);
   if (!product) notFound();
 
   const index = products.findIndex((p) => p.handle === handle);
@@ -47,10 +49,7 @@ export default async function ProductPage({ params }: Props) {
     },
   } : null;
 
-  const checkoutHref =
-    commerceReady && product.shopifyVariantId
-      ? `/api/checkout?variant=${encodeURIComponent(product.shopifyVariantId)}`
-      : null;
+  const checkoutEnabled = commerceReady;
 
   return (
     <main className="product-page">
@@ -103,8 +102,20 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
 
-          {checkoutHref ? (
-            <Link className="disabled-buy" href={checkoutHref}>BUY NOW</Link>
+          {checkoutEnabled ? (
+            <form action="/api/checkout" method="GET">
+              <input type="hidden" name="product" value={product.id} />
+              {product.sizes?.length ? (
+                <label style={{ display:"grid", gap:8, marginBottom:14 }}>
+                  <span className="eyebrow">SIZE</span>
+                  <select name="size" required defaultValue="">
+                    <option value="" disabled>Select size</option>
+                    {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
+                  </select>
+                </label>
+              ) : null}
+              <button className="disabled-buy" type="submit">BUY NOW</button>
+            </form>
           ) : (
             <button className="disabled-buy" disabled>NOT YET AVAILABLE FOR PURCHASE</button>
           )}

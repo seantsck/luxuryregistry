@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
-import { products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 import { channelOffers, csvCell } from "@/lib/channels";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const products = await loadCatalog();
   const offers = channelOffers(products, request.nextUrl.origin);
   const header = [
     "id","title","description","link","image_link","price","availability",

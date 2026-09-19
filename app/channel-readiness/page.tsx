@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 import { channelIssues, isChannelReady } from "@/lib/channels";
 
 export const metadata = {
@@ -7,7 +7,8 @@ export const metadata = {
   description: "Luxury Registry marketplace feed and catalog readiness.",
 };
 
-export default function ChannelReadinessPage() {
+export default async function ChannelReadinessPage() {
+  const products = await loadCatalog();
   const eligible = products.filter(isChannelReady);
   const blocked = products.filter((product) => !isChannelReady(product));
 

@@ -32,7 +32,7 @@ The storefront exposes channel feeds, but products are exported only after they 
 
 - verified supplier authorization/authenticity
 - channelReady=true
-- buyable=true with a real checkoutUrl
+- buyable=true and Stripe checkout configured
 - product image present
 - valid price and color
 - sizes for non-bag products

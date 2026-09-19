@@ -8,7 +8,24 @@ export async function GET() {
   const imageBase = process.env.NEXT_PUBLIC_PRODUCT_IMAGE_BASE_URL?.replace(/\/$/, "");
   const secretKey = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
   const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
-  const stripeMode = stripeKey?.startsWith("sk_test_") ? "test" : stripeKey?.startsWith("sk_live_") ? "live" : stripeKey ? "unknown" : null;
+  let stripeMode: "test" | "live" | "unknown" | null = stripeKey ? "unknown" : null;
+  let stripeApiStatus: number | null = null;
+
+  if (stripeKey) {
+    try {
+      const stripeResponse = await fetch("https://api.stripe.com/v1/balance", {
+        headers: { Authorization: `Bearer ${stripeKey}` },
+        cache: "no-store",
+      });
+      stripeApiStatus = stripeResponse.status;
+      if (stripeResponse.ok) {
+        const stripePayload = await stripeResponse.json();
+        stripeMode = stripePayload?.livemode === true ? "live" : stripePayload?.livemode === false ? "test" : "unknown";
+      }
+    } catch {
+      stripeApiStatus = -1;
+    }
+  }
   const stripeWebhook = process.env.STRIPE_WEBHOOK_SECRET?.trim();
 
   let catalogStatus: number | null = null;
@@ -69,6 +86,7 @@ export async function GET() {
     imageBaseConfigured: Boolean(imageBase),
     stripeSecretConfigured: Boolean(stripeKey),
     stripeMode,
+    stripeApiStatus,
     stripeWebhookConfigured: Boolean(stripeWebhook),
     supabaseHost: supabaseUrl ? new URL(supabaseUrl).host : null,
     imageHost: imageBase ? new URL(imageBase).host : null,

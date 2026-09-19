@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const key = process.env.STRIPE_SECRET_KEY?.trim();
+  const key = process.env.STRIPE_TEST_SECRET_KEY?.trim();
   const site = (process.env.NEXT_PUBLIC_SITE_URL || "https://luxuryregistry.io").replace(/\/$/, "");
 
   if (!key) {
-    return NextResponse.json({ error: "Stripe is not configured." }, { status: 503 });
+    return NextResponse.json({ error: "STRIPE_TEST_SECRET_KEY is not configured." }, { status: 503 });
   }
 
   const modeCheck = await fetch("https://api.stripe.com/v1/balance", {

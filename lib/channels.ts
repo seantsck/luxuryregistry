@@ -3,7 +3,9 @@ import type { Product } from "./products";
 export type ChannelIssue =
   | "verification-pending"
   | "channel-disabled"
-  | "checkout-disabled"\n  | "missing-checkout-url"\n  | "missing-image"
+  | "checkout-disabled"
+  | "missing-checkout-url"
+  | "missing-image"
   | "missing-price"
   | "missing-color"
   | "missing-size"
@@ -35,7 +37,9 @@ export function channelIssues(product: Product): ChannelIssue[] {
 
   if (!product.verified) issues.push("verification-pending");
   if (!product.channelReady) issues.push("channel-disabled");
-  if (!product.buyable) issues.push("checkout-disabled");\n  if (!product.checkoutUrl) issues.push("missing-checkout-url");\n  if (!product.image) issues.push("missing-image");
+  if (!product.buyable) issues.push("checkout-disabled");
+  if (!product.checkoutUrl) issues.push("missing-checkout-url");
+  if (!product.image) issues.push("missing-image");
   if (!product.price || product.price <= 0) issues.push("missing-price");
   if (!product.colors?.trim()) issues.push("missing-color");
 

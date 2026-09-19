@@ -1,0 +1,25 @@
+export type Product = {
+  id: string;
+  handle: string;
+  title: string;
+  brand: string;
+  type: string;
+  department: "Tops" | "Outerwear" | "Denim" | "Footwear" | "Bags";
+  price: number;
+  compareAt?: number;
+  colors: string;
+  short: string;
+  image?: string;
+  imageFile?: string;
+  sizes?: string[];
+  gender?: "unisex" | "male" | "female";
+  availability?: "in stock" | "out of stock" | "preorder";
+  verified?: boolean;
+  channelReady?: boolean;
+  buyable?: boolean;
+  checkoutUrl?: string;
+  shopifyVariantId?: string;
+  gtin?: string;
+  mpn?: string;
+  identifierExists?: boolean;
+};

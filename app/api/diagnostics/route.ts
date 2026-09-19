@@ -34,6 +34,22 @@ export async function GET() {
   let sampleImageFile: string | null = null;
   let sampleImageUrl: string | null = null;
   let sampleImageStatus: number | null = null;
+  let ordersApiStatus: number | null = null;
+
+  if (supabaseUrl && secretKey) {
+    try {
+      const ordersResponse = await fetch(
+        `${supabaseUrl}/rest/v1/orders?select=id&limit=1`,
+        {
+          headers: { apikey: secretKey },
+          cache: "no-store",
+        },
+      );
+      ordersApiStatus = ordersResponse.status;
+    } catch {
+      ordersApiStatus = -1;
+    }
+  }
 
   if (supabaseUrl && publishableKey) {
     try {
@@ -96,5 +112,6 @@ export async function GET() {
     sampleImageFile,
     sampleImageUrl,
     sampleImageStatus,
+    ordersApiStatus,
   });
 }

@@ -66,7 +66,11 @@ export default async function ProductPage({ params }: Props) {
           ) : (
             <div className="verification-box"><span>VERIFICATION STATUS</span><strong>HOLD — DOCUMENTATION REQUIRED</strong><p>This object is cataloged from supplier imagery. Visible branding does not establish authenticity or authorization. Purchasing is disabled during verification.</p></div>
           )}
-          {commerceReady && product.checkoutUrl ? (\n            <Link className="disabled-buy" href={product.checkoutUrl}>BUY NOW</Link>\n          ) : (\n            <button className="disabled-buy" disabled>NOT YET AVAILABLE FOR PURCHASE</button>\n          )}
+          {commerceReady && product.checkoutUrl ? (
+            <Link className="disabled-buy" href={product.checkoutUrl}>BUY NOW</Link>
+          ) : (
+            <button className="disabled-buy" disabled>NOT YET AVAILABLE FOR PURCHASE</button>
+          )}
           <dl className="product-specs">
             <div><dt>Registry no.</dt><dd>{product.id}</dd></div><div><dt>Type</dt><dd>{product.type}</dd></div><div><dt>Colorways</dt><dd>{product.colors}</dd></div><div><dt>Availability</dt><dd>{commerceReady ? product.availability ?? "In stock" : "Made to order"}</dd></div><div><dt>Catalog status</dt><dd>{commerceReady ? "Channel eligible" : "Private preview"}</dd></div>
           </dl>

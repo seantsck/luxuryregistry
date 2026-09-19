@@ -33,6 +33,8 @@ export async function createStripeCheckoutSession(
   );
   body.set("metadata[registry_id]", product.id);
   body.set("metadata[handle]", product.handle);
+  body.set("metadata[product_title]", product.title.slice(0, 500));
+  body.set("metadata[quantity]", String(quantity));
   if (size) body.set("metadata[size]", size);
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {

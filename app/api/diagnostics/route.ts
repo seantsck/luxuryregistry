@@ -13,20 +13,45 @@ export async function GET() {
   let catalogStatus: number | null = null;
   let catalogCount: number | null = null;
   let catalogError: string | null = null;
+  let sampleImageFile: string | null = null;
+  let sampleImageUrl: string | null = null;
+  let sampleImageStatus: number | null = null;
 
   if (supabaseUrl && publishableKey) {
     try {
       const response = await fetch(
-        `${supabaseUrl}/rest/v1/products?select=id&catalog_visible=eq.true&limit=1000`,
+        `${supabaseUrl}/rest/v1/products?select=id,image_file,image_url&catalog_visible=eq.true&order=id.asc&limit=1000`,
         {
           headers: { apikey: publishableKey },
           cache: "no-store",
         },
       );
       catalogStatus = response.status;
+
       if (response.ok) {
         const rows = await response.json();
         catalogCount = Array.isArray(rows) ? rows.length : null;
+
+        const first = Array.isArray(rows) ? rows[0] : null;
+        sampleImageFile = first?.image_file || null;
+
+        if (first?.image_url) {
+          sampleImageUrl = first.image_url;
+        } else if (imageBase && sampleImageFile) {
+          sampleImageUrl = `${imageBase}/${encodeURIComponent(sampleImageFile)}`;
+        }
+
+        if (sampleImageUrl) {
+          try {
+            const imageResponse = await fetch(sampleImageUrl, {
+              method: "HEAD",
+              cache: "no-store",
+            });
+            sampleImageStatus = imageResponse.status;
+          } catch {
+            sampleImageStatus = -1;
+          }
+        }
       } else {
         catalogError = (await response.text()).slice(0, 500);
       }
@@ -48,5 +73,8 @@ export async function GET() {
     catalogStatus,
     catalogCount,
     catalogError,
+    sampleImageFile,
+    sampleImageUrl,
+    sampleImageStatus,
   });
 }

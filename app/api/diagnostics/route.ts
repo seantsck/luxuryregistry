@@ -1,0 +1,52 @@
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+  const imageBase = process.env.NEXT_PUBLIC_PRODUCT_IMAGE_BASE_URL?.replace(/\/$/, "");
+  const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();
+  const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+  const stripeWebhook = process.env.STRIPE_WEBHOOK_SECRET?.trim();
+
+  let catalogStatus: number | null = null;
+  let catalogCount: number | null = null;
+  let catalogError: string | null = null;
+
+  if (supabaseUrl && publishableKey) {
+    try {
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/products?select=id&catalog_visible=eq.true&limit=1000`,
+        {
+          headers: { apikey: publishableKey },
+          cache: "no-store",
+        },
+      );
+      catalogStatus = response.status;
+      if (response.ok) {
+        const rows = await response.json();
+        catalogCount = Array.isArray(rows) ? rows.length : null;
+      } else {
+        catalogError = (await response.text()).slice(0, 500);
+      }
+    } catch (error) {
+      catalogError = error instanceof Error ? error.message : "Unknown fetch error";
+    }
+  }
+
+  return NextResponse.json({
+    siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
+    supabaseUrlConfigured: Boolean(supabaseUrl),
+    supabasePublishableKeyConfigured: Boolean(publishableKey),
+    supabaseSecretKeyConfigured: Boolean(secretKey),
+    imageBaseConfigured: Boolean(imageBase),
+    stripeSecretConfigured: Boolean(stripeKey),
+    stripeWebhookConfigured: Boolean(stripeWebhook),
+    supabaseHost: supabaseUrl ? new URL(supabaseUrl).host : null,
+    imageHost: imageBase ? new URL(imageBase).host : null,
+    catalogStatus,
+    catalogCount,
+    catalogError,
+  });
+}

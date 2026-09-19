@@ -24,6 +24,12 @@ type ProductRow = {
   identifier_exists: boolean;
 };
 
+function publicImageUrl(imageFile?: string | null) {
+  if (!imageFile) return undefined;
+  const base = process.env.NEXT_PUBLIC_PRODUCT_IMAGE_BASE_URL?.replace(/\/$/, "");
+  return base ? `${base}/${encodeURIComponent(imageFile)}` : undefined;
+}
+
 function rowToProduct(row: ProductRow): Product {
   return {
     id: row.id,
@@ -37,7 +43,7 @@ function rowToProduct(row: ProductRow): Product {
     colors: row.colors,
     short: row.short_description,
     imageFile: row.image_file || undefined,
-    image: row.image_url || undefined,
+    image: row.image_url || publicImageUrl(row.image_file),
     sizes: row.sizes || undefined,
     availability: row.availability,
     verified: row.verified,

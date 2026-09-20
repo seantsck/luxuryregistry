@@ -14,7 +14,7 @@ export default async function ShopPage() {
       <div className="shop-intro">
         <p className="eyebrow">THE REGISTER · {products.length} OBJECTS</p>
         <h1>Index of objects.</h1>
-        <p>Explore the full Luxury Registry collection. Every item shown in the register is available to order, with supplier production fulfilled on demand.</p>
+        <p>Explore the full Luxury Registry collection. Every item shown in the register is available to order.</p>
       </div>
       <CatalogBrowser products={products} />
     </main>

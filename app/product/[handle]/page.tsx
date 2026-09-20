@@ -114,6 +114,14 @@ export default async function ProductPage({ params }: Props) {
                   </select>
                 </label>
               ) : null}
+              <label style={{ display:"grid", gap:8, marginBottom:14 }}>
+                <span className="eyebrow">QUANTITY</span>
+                <select name="quantity" defaultValue="1">
+                  {[1,2,3,4,5,6,7,8,9,10].map((quantity) => (
+                    <option key={quantity} value={quantity}>{quantity}</option>
+                  ))}
+                </select>
+              </label>
               <button className="disabled-buy" type="submit">BUY NOW</button>
             </form>
           ) : (

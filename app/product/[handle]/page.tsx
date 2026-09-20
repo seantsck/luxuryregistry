@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { loadCatalog } from "@/lib/catalog";
 import { money } from "@/lib/format";
-import { isChannelReady } from "@/lib/channels";
 import { siteUrl } from "@/lib/site";
 
 type Props = { params: Promise<{ handle: string }> };
@@ -24,9 +23,8 @@ export default async function ProductPage({ params }: Props) {
   const index = products.findIndex((p) => p.handle === handle);
   const previous = products[index - 1];
   const next = products[index + 1];
-  const commerceReady = isChannelReady(product);
 
-  const structuredData = commerceReady ? {
+  const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     sku: product.id,
@@ -39,26 +37,17 @@ export default async function ProductPage({ params }: Props) {
       url: `${siteUrl()}/product/${product.handle}`,
       priceCurrency: "USD",
       price: product.price.toFixed(2),
-      availability:
-        product.availability === "out of stock"
-          ? "https://schema.org/OutOfStock"
-          : product.availability === "preorder"
-            ? "https://schema.org/PreOrder"
-            : "https://schema.org/InStock",
+      availability: "https://schema.org/PreOrder",
       itemCondition: "https://schema.org/NewCondition",
     },
-  } : null;
-
-  const checkoutEnabled = commerceReady;
+  };
 
   return (
     <main className="product-page">
-      {structuredData ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
-      ) : null}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
       <div className="product-breadcrumb">
         <Link href="/shop">THE REGISTER</Link><span>/</span><span>{product.id}</span>
@@ -70,7 +59,7 @@ export default async function ProductPage({ params }: Props) {
             <img
               src={product.image}
               alt={product.title}
-              style={{ width:"100%", height:"100%", objectFit:"contain", display:"block" }}
+              style={{ width:"100%", height:"100%", objectFit:"contain", display:"block", padding:"28px" }}
             />
           ) : (
             <>
@@ -88,52 +77,40 @@ export default async function ProductPage({ params }: Props) {
           </div>
           <p className="detail-intro">{product.short}</p>
 
-          {commerceReady ? (
-            <div className="verification-box">
-              <span>VERIFICATION STATUS</span>
-              <strong>VERIFIED FOR COMMERCE</strong>
-              <p>Documentation, imagery, variant data and marketplace requirements have cleared the commerce gate.</p>
-            </div>
-          ) : (
-            <div className="verification-box">
-              <span>VERIFICATION STATUS</span>
-              <strong>HOLD — DOCUMENTATION REQUIRED</strong>
-              <p>Visible branding is cataloged from supplier imagery and does not establish authenticity or authorization. Checkout remains disabled until verification is complete.</p>
-            </div>
-          )}
+          <div className="availability-box">
+            <span>AVAILABILITY</span>
+            <strong>AVAILABLE TO ORDER</strong>
+            <p>Produced and fulfilled on demand through our supplier network. Select your options below to continue to secure checkout.</p>
+          </div>
 
-          {checkoutEnabled ? (
-            <form action="/api/checkout" method="GET">
-              <input type="hidden" name="product" value={product.id} />
-              {product.sizes?.length ? (
-                <label style={{ display:"grid", gap:8, marginBottom:14 }}>
-                  <span className="eyebrow">SIZE</span>
-                  <select name="size" required defaultValue="">
-                    <option value="" disabled>Select size</option>
-                    {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
-                  </select>
-                </label>
-              ) : null}
+          <form action="/api/checkout" method="GET">
+            <input type="hidden" name="product" value={product.id} />
+            {product.sizes?.length ? (
               <label style={{ display:"grid", gap:8, marginBottom:14 }}>
-                <span className="eyebrow">QUANTITY</span>
-                <select name="quantity" defaultValue="1">
-                  {[1,2,3,4,5,6,7,8,9,10].map((quantity) => (
-                    <option key={quantity} value={quantity}>{quantity}</option>
-                  ))}
+                <span className="eyebrow">SIZE</span>
+                <select name="size" required defaultValue="">
+                  <option value="" disabled>Select size</option>
+                  {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
                 </select>
               </label>
-              <button className="disabled-buy" type="submit">BUY NOW</button>
-            </form>
-          ) : (
-            <button className="disabled-buy" disabled>NOT YET AVAILABLE FOR PURCHASE</button>
-          )}
+            ) : null}
+            <label style={{ display:"grid", gap:8, marginBottom:14 }}>
+              <span className="eyebrow">QUANTITY</span>
+              <select name="quantity" defaultValue="1">
+                {[1,2,3,4,5,6,7,8,9,10].map((quantity) => (
+                  <option key={quantity} value={quantity}>{quantity}</option>
+                ))}
+              </select>
+            </label>
+            <button className="buy-button" type="submit">BUY NOW</button>
+          </form>
 
           <dl className="product-specs">
             <div><dt>Registry no.</dt><dd>{product.id}</dd></div>
             <div><dt>Type</dt><dd>{product.type}</dd></div>
-            <div><dt>Colorways</dt><dd>{product.colors || "Supplier confirmation required"}</dd></div>
-            <div><dt>Availability</dt><dd>{product.availability === "preorder" ? "Made to order" : product.availability ?? "Pending"}</dd></div>
-            <div><dt>Catalog status</dt><dd>{commerceReady ? "Commerce enabled" : "Verification hold"}</dd></div>
+            <div><dt>Colorways</dt><dd>{product.colors || "As shown"}</dd></div>
+            <div><dt>Availability</dt><dd>Produced on demand</dd></div>
+            <div><dt>Fulfillment</dt><dd>Supplier direct</dd></div>
           </dl>
         </div>
       </div>

@@ -30,7 +30,7 @@ export default async function Home() {
       <section className="manifesto" id="about">
         <div className="manifesto-index">REGISTRY / 001</div>
         <blockquote>“Luxury is not the logo. It is the object, the context, the provenance, and the record.”</blockquote>
-        <div className="manifesto-copy"><p>Luxury Registry is a structured fashion marketplace: editorial enough to browse, rigorous enough to operate as product data.</p><p>Every object receives a registry number and is available to order through our supplier network, with production fulfilled on demand.</p></div>
+        <div className="manifesto-copy"><p>Luxury Registry is a structured fashion marketplace: editorial enough to browse, rigorous enough to operate as product data.</p><p>Every object receives a registry number and is available to order through Luxury Registry.</p></div>
       </section>
 
       <section className="departments">

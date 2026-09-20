@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { products } from "@/lib/products";
+import { loadCatalog } from "@/lib/catalog";
 import { isChannelReady } from "@/lib/channels";
 import { createStripeCheckoutSession } from "@/lib/stripe";
 
@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing product." }, { status: 400 });
   }
 
+  const products = await loadCatalog();
   const product = products.find((item) => item.id === productId);
 
   if (!product || !isChannelReady(product)) {

@@ -11,7 +11,7 @@ export function ProductCard({ product }: { product: Product }) {
             src={product.image}
             alt={product.title}
             loading="lazy"
-            style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+            style={{ width:"100%", height:"100%", objectFit:"contain", display:"block", padding:"18px" }}
           />
         ) : (
           <>
@@ -22,7 +22,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </Link>
       <div className="product-card-copy">
-        <p className="eyebrow">{product.brand}</p>
+        <p className="eyebrow">{product.brand} · {product.id}</p>
         <Link href={"/product/" + product.handle}><h3>{product.title}</h3></Link>
         <div className="price-line">
           <span>{money(product.price)}</span>

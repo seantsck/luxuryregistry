@@ -37,7 +37,7 @@ export default async function ProductPage({ params }: Props) {
       url: `${siteUrl()}/product/${product.handle}`,
       priceCurrency: "USD",
       price: product.price.toFixed(2),
-      availability: "https://schema.org/PreOrder",
+      availability: "https://schema.org/InStock",
       itemCondition: "https://schema.org/NewCondition",
     },
   };
@@ -80,7 +80,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="availability-box">
             <span>AVAILABILITY</span>
             <strong>AVAILABLE TO ORDER</strong>
-            <p>Produced and fulfilled on demand through our supplier network. Select your options below to continue to secure checkout.</p>
+            <p>Select your options below to continue to secure checkout.</p>
           </div>
 
           <form action="/api/checkout" method="GET">
@@ -109,8 +109,7 @@ export default async function ProductPage({ params }: Props) {
             <div><dt>Registry no.</dt><dd>{product.id}</dd></div>
             <div><dt>Type</dt><dd>{product.type}</dd></div>
             <div><dt>Colorways</dt><dd>{product.colors || "As shown"}</dd></div>
-            <div><dt>Availability</dt><dd>Produced on demand</dd></div>
-            <div><dt>Fulfillment</dt><dd>Supplier direct</dd></div>
+            <div><dt>Availability</dt><dd>Available to order</dd></div>
           </dl>
         </div>
       </div>

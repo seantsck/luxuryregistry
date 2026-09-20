@@ -4,7 +4,7 @@ import { loadCatalog } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title:"The Register",
-  description:"Browse all 625 cataloged Luxury Registry objects."
+  description:"Browse the Luxury Registry collection."
 };
 
 export default async function ShopPage() {
@@ -12,9 +12,9 @@ export default async function ShopPage() {
   return (
     <main className="shop-page">
       <div className="shop-intro">
-        <p className="eyebrow">THE REGISTER · 625 CATALOGED OBJECTS</p>
+        <p className="eyebrow">THE REGISTER · {products.length} OBJECTS</p>
         <h1>Index of objects.</h1>
-        <p>The reconciled master catalog is live. Commerce remains verification-gated: a listing becomes purchasable only after its documentation, product data, imagery and Stripe checkout requirements are cleared.</p>
+        <p>Explore the full Luxury Registry collection. Every item shown in the register is available to order, with supplier production fulfilled on demand.</p>
       </div>
       <CatalogBrowser products={products} />
     </main>

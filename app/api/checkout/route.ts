@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadCatalog } from "@/lib/catalog";
-import { isChannelReady } from "@/lib/channels";
 import { createStripeCheckoutSession } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
@@ -20,10 +19,17 @@ export async function GET(request: NextRequest) {
   const products = await loadCatalog();
   const product = products.find((item) => item.id === productId);
 
-  if (!product || !isChannelReady(product)) {
+  if (!product) {
     return NextResponse.json(
-      { error: "This product is not cleared for checkout." },
-      { status: 403 },
+      { error: "This product could not be found." },
+      { status: 404 },
+    );
+  }
+
+  if (!Number.isFinite(product.price) || product.price <= 0) {
+    return NextResponse.json(
+      { error: "This product does not have a valid price." },
+      { status: 400 },
     );
   }
 

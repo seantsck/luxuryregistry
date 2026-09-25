@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { loadCatalog } from "@/lib/catalog";
-import { channelIssues, channelOffers, needsBrandReview, type ChannelIssue } from "@/lib/channels";
+import { channelIssues, channelOffers, type ChannelIssue } from "@/lib/channels";
 
 export const dynamic = "force-dynamic";
 
@@ -26,13 +26,16 @@ export async function GET(request: NextRequest) {
     missingCompareAt: products.filter(
       (product) => !product.compareAt || product.compareAt <= product.price,
     ).length,
-    missingSizes: products.filter(
+    openSizeProducts: products.filter(
       (product) => product.department !== "Bags" && (!product.sizes || product.sizes.length === 0),
+    ).length,
+    defaultPrice99: products.filter(
+      (product) => product.price === 99 && !product.compareAt,
     ).length,
     descriptionsUnder80Characters: products.filter(
       (product) => product.short.trim().length < 80,
     ).length,
-    brandReviewRequired: products.filter(needsBrandReview).length,
+    supplierApproved: products.filter((product) => product.verified).length,
   };
 
   const includeDetails = request.nextUrl.searchParams.get("details") === "1";
@@ -54,9 +57,9 @@ export async function GET(request: NextRequest) {
     },
     nextActions: [
       { key: "verification", count: issueCounts["verification-pending"] ?? 0 },
-      { key: "brand-review", count: issueCounts["brand-review-required"] ?? 0 },
-      { key: "sizes", count: issueCounts["missing-size"] ?? 0 },
       { key: "publish-switch", count: issueCounts["channel-disabled"] ?? 0 },
+      { key: "open-size-entry", count: products.filter((product) => product.department !== "Bags" && (!product.sizes || product.sizes.length === 0)).length },
+      { key: "default-price-99", count: products.filter((product) => product.price === 99 && !product.compareAt).length },
     ],
     ...(includeDetails ? { blocked } : {}),
   });

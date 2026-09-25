@@ -7,6 +7,28 @@ import { siteUrl } from "@/lib/site";
 
 type Props = { params: Promise<{ handle: string }> };
 
+async function existingProductImages(images: string[]) {
+  if (images.length <= 1) return images;
+
+  const checked = await Promise.all(
+    images.map(async (image, index) => {
+      if (index === 0) return image;
+
+      try {
+        const response = await fetch(image, {
+          method: "HEAD",
+          next: { revalidate: 300 },
+        });
+        return response.ok ? image : undefined;
+      } catch {
+        return undefined;
+      }
+    }),
+  );
+
+  return checked.filter((image): image is string => Boolean(image));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
   const products = await loadCatalog();
@@ -23,7 +45,8 @@ export default async function ProductPage({ params }: Props) {
   const index = products.findIndex((p) => p.handle === handle);
   const previous = products[index - 1];
   const next = products[index + 1];
-  const productImages = product.images?.length ? product.images : product.image ? [product.image] : [];
+  const imageCandidates = product.images?.length ? product.images : product.image ? [product.image] : [];
+  const productImages = await existingProductImages(imageCandidates);
 
   const structuredData = {
     "@context": "https://schema.org",

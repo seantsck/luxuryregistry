@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
       <description>${xmlEscape(offer.description)}</description>
       <link>${xmlEscape(offer.link)}</link>
       <g:image_link>${xmlEscape(offer.imageLink)}</g:image_link>
+      ${offer.additionalImageLinks.map((image) => `<g:additional_image_link>${xmlEscape(image)}</g:additional_image_link>`).join("")}
       <g:condition>${offer.condition}</g:condition>
       <g:availability>${offer.availability}</g:availability>
       <g:price>${offer.price}</g:price>

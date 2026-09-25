@@ -2,8 +2,8 @@ import type { Product } from "./product-types";
 
 export type ChannelIssue =
   | "verification-pending"
+  | "brand-review-required"
   | "channel-disabled"
-  | "checkout-disabled"
   | "missing-image"
   | "missing-price"
   | "missing-color"
@@ -17,6 +17,7 @@ export type ChannelOffer = {
   description: string;
   link: string;
   imageLink: string;
+  additionalImageLinks: string[];
   price: string;
   availability: "in stock" | "out of stock" | "preorder";
   condition: "new";
@@ -31,12 +32,19 @@ export type ChannelOffer = {
   productType: string;
 };
 
+const BRAND_REVIEW_PATTERN =
+  /unverified|appears|verification required|supplier-presented|style\b/i;
+
+export function needsBrandReview(product: Product) {
+  return BRAND_REVIEW_PATTERN.test(product.brand);
+}
+
 export function channelIssues(product: Product): ChannelIssue[] {
   const issues: ChannelIssue[] = [];
 
   if (!product.verified) issues.push("verification-pending");
+  if (needsBrandReview(product)) issues.push("brand-review-required");
   if (!product.channelReady) issues.push("channel-disabled");
-  if (!product.buyable) issues.push("checkout-disabled");
   if (!product.image) issues.push("missing-image");
   if (!product.price || product.price <= 0) issues.push("missing-price");
   if (!product.colors?.trim()) issues.push("missing-color");
@@ -61,7 +69,7 @@ export function isChannelReady(product: Product) {
 }
 
 function firstColor(colors: string) {
-  return colors.split(/[·,/]/).map((v) => v.trim()).filter(Boolean)[0] || "Multicolor";
+  return colors.split(/[;·,/]/).map((v) => v.trim()).filter(Boolean)[0] || "Multicolor";
 }
 
 function sizeSlug(size: string) {
@@ -73,24 +81,37 @@ function absoluteUrl(origin: string, value: string) {
   return new URL(value.startsWith("/") ? value : `/${value}`, origin).toString();
 }
 
+function cleanText(value: string, maxLength: number) {
+  const text = value.replace(/\s+/g, " ").trim();
+  return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 export function channelOffers(products: Product[], origin: string): ChannelOffer[] {
   return products.flatMap((product) => {
     if (!isChannelReady(product)) return [];
 
     const sizes = product.sizes?.length ? product.sizes : [undefined];
     const hasVariants = sizes.length > 1;
+    const imageCandidates = Array.from(
+      new Set([product.image, ...(product.images ?? [])].filter((image): image is string => Boolean(image))),
+    );
+    const imageLink = absoluteUrl(origin, imageCandidates[0]!);
+    const additionalImageLinks = imageCandidates
+      .slice(1, 11)
+      .map((image) => absoluteUrl(origin, image));
 
     return sizes.map((size) => ({
       id: size ? `${product.id}-${sizeSlug(size)}` : product.id,
       itemGroupId: hasVariants ? product.id : undefined,
-      title: size ? `${product.title} — ${size}` : product.title,
-      description: product.short,
+      title: cleanText(size ? `${product.title} — ${size}` : product.title, 150),
+      description: cleanText(product.short, 5000),
       link: absoluteUrl(origin, `/product/${product.handle}`),
-      imageLink: absoluteUrl(origin, product.image!),
+      imageLink,
+      additionalImageLinks,
       price: `${product.price.toFixed(2)} USD`,
       availability: product.availability ?? "in stock",
       condition: "new",
-      brand: product.brand,
+      brand: product.brand.trim(),
       color: firstColor(product.colors),
       size,
       gender: product.gender ?? "unisex",

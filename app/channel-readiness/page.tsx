@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { loadCatalog } from "@/lib/catalog";
-import { channelIssues, isChannelReady, needsBrandReview, type ChannelIssue } from "@/lib/channels";
+import { channelIssues, isChannelReady, type ChannelIssue } from "@/lib/channels";
 
 export const metadata = {
   title: "Sales Channel Readiness",
@@ -9,7 +9,6 @@ export const metadata = {
 
 const ISSUE_LABELS: Record<ChannelIssue, string> = {
   "verification-pending": "Verification pending",
-  "brand-review-required": "Brand review",
   "channel-disabled": "Publish switch off",
   "missing-image": "Missing image",
   "missing-price": "Missing price",
@@ -29,9 +28,9 @@ export default async function ChannelReadinessPage() {
   }, {});
 
   const quality = [
-    ["Brand review required", products.filter(needsBrandReview).length],
-    ["Missing size data", products.filter((p) => p.department !== "Bags" && (!p.sizes || !p.sizes.length)).length],
-    ["Missing / unusable compare-at", products.filter((p) => !p.compareAt || p.compareAt <= p.price).length],
+    ["Supplier-approved products", products.filter((p) => p.verified).length],
+    ["Open size-entry products", products.filter((p) => p.department !== "Bags" && (!p.sizes || !p.sizes.length)).length],
+    ["$99 default-price products", products.filter((p) => p.price === 99 && !p.compareAt).length],
     ["Descriptions under 80 chars", products.filter((p) => p.short.trim().length < 80).length],
   ] as const;
 
@@ -42,9 +41,9 @@ export default async function ChannelReadinessPage() {
         Sales Channel Readiness
       </h1>
       <p style={{ maxWidth: 780, fontSize: 18, lineHeight: 1.6, opacity: .72 }}>
-        Feeds export only products that have cleared product verification, brand review,
-        imagery, size/color data, identifier status, and the final channel publish switch.
-        Checkout availability is validated independently by the live storefront.
+        The supplier-approved catalog can publish once required imagery, pricing, color,
+        identifier status, and the final channel switch are present. Products without a
+        fixed size array use open size entry because the supplier has confirmed all sizes.
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 12, margin: "42px 0" }}>

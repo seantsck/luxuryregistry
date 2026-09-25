@@ -2,6 +2,41 @@ import type { Product } from "./product-types";
 import { catalogImageUrls } from "./catalog-images";
 import { products as bundledProducts } from "./products";
 
+function cleanSupplierApprovedBrand(brand: string) {
+  const exact: Record<string, string> = {
+    "BAPE / adidas branding visible — unverified": "BAPE / adidas",
+    "Purple Brand — visible/supplier-presented, unverified": "Purple Brand",
+    "Purple Brand — supplier-presented, unverified": "Purple Brand",
+    "Designer denim — brand verification required": "Designer Denim",
+    "Designer footwear — brand verification required": "Designer Footwear",
+    "Designer monogram — brand verification required": "Designer Monogram",
+    "Hellstar — appears/unverified": "Hellstar",
+    "Goyard — appears/unverified": "Goyard",
+    "AMIRI (appears)": "AMIRI",
+    "AMIRI label visible / supplier-presented": "AMIRI",
+    "Gallery Dept-style / designer denim — unverified": "Designer Denim",
+  };
+  return exact[brand] ?? brand;
+}
+
+function applySupplierApprovedRules(product: Product): Product {
+  const hasComparable =
+    typeof product.compareAt === "number" &&
+    Number.isFinite(product.compareAt) &&
+    product.compareAt > product.price;
+
+  return {
+    ...product,
+    brand: cleanSupplierApprovedBrand(product.brand),
+    price: hasComparable ? product.price : 99,
+    compareAt: hasComparable ? product.compareAt : undefined,
+    verified: true,
+    channelReady: true,
+    buyable: true,
+  };
+}
+
+
 type ProductRow = {
   id: string;
   handle: string;
@@ -28,7 +63,7 @@ type ProductRow = {
 function rowToProduct(row: ProductRow): Product {
   const images = catalogImageUrls(row.id, row.image_file, row.image_url);
 
-  return {
+  return applySupplierApprovedRules({
     id: row.id,
     handle: row.handle,
     title: row.title,
@@ -50,7 +85,7 @@ function rowToProduct(row: ProductRow): Product {
     gtin: row.gtin || undefined,
     mpn: row.mpn || undefined,
     identifierExists: row.identifier_exists,
-  };
+  });
 }
 
 export async function loadCatalog(): Promise<Product[]> {

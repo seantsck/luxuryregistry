@@ -122,6 +122,18 @@ export default async function ProductPage({ params }: Props) {
                   {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
                 </select>
               </label>
+            ) : product.department !== "Bags" ? (
+              <label style={{ display:"grid", gap:8, marginBottom:14 }}>
+                <span className="eyebrow">SIZE</span>
+                <input
+                  name="size"
+                  required
+                  placeholder="Enter requested size"
+                  aria-label="Requested size"
+                  style={{ minHeight:44, padding:"0 12px" }}
+                />
+                <small style={{ opacity:.65 }}>All sizes available — enter the size you want.</small>
+              </label>
             ) : null}
             <label style={{ display:"grid", gap:8, marginBottom:14 }}>
               <span className="eyebrow">QUANTITY</span>

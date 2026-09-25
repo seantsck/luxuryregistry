@@ -101,6 +101,7 @@ export default async function ChannelReadinessPage() {
           <Link href="/feeds/microsoft.tsv">Microsoft Merchant Center — /feeds/microsoft.tsv</Link>
           <Link href="/api/channels/status">Readiness summary — /api/channels/status</Link>
           <Link href="/api/channels/status?details=1">Full blocker detail — /api/channels/status?details=1</Link>
+          <Link href="/api/channels/remediation.csv">Supplier remediation CSV — /api/channels/remediation.csv</Link>
         </div>
       </section>
 

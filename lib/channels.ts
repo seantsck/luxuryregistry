@@ -2,7 +2,6 @@ import type { Product } from "./product-types";
 
 export type ChannelIssue =
   | "verification-pending"
-  | "brand-review-required"
   | "channel-disabled"
   | "missing-image"
   | "missing-price"
@@ -32,26 +31,14 @@ export type ChannelOffer = {
   productType: string;
 };
 
-const BRAND_REVIEW_PATTERN =
-  /unverified|appears|verification required|supplier-presented|style\b/i;
-
-export function needsBrandReview(product: Product) {
-  return BRAND_REVIEW_PATTERN.test(product.brand);
-}
-
 export function channelIssues(product: Product): ChannelIssue[] {
   const issues: ChannelIssue[] = [];
 
   if (!product.verified) issues.push("verification-pending");
-  if (needsBrandReview(product)) issues.push("brand-review-required");
   if (!product.channelReady) issues.push("channel-disabled");
   if (!product.image) issues.push("missing-image");
   if (!product.price || product.price <= 0) issues.push("missing-price");
   if (!product.colors?.trim()) issues.push("missing-color");
-
-  if (product.department !== "Bags" && (!product.sizes || product.sizes.length === 0)) {
-    issues.push("missing-size");
-  }
 
   if (
     product.identifierExists === undefined &&
@@ -90,8 +77,9 @@ export function channelOffers(products: Product[], origin: string): ChannelOffer
   return products.flatMap((product) => {
     if (!isChannelReady(product)) return [];
 
-    const sizes = product.sizes?.length ? product.sizes : [undefined];
-    const hasVariants = sizes.length > 1;
+    const openSize = product.department !== "Bags" && (!product.sizes || product.sizes.length === 0);
+    const sizes = product.sizes?.length ? product.sizes : openSize ? ["All Sizes"] : [undefined];
+    const hasVariants = Boolean(product.sizes && product.sizes.length > 1);
     const imageCandidates = Array.from(
       new Set([product.image, ...(product.images ?? [])].filter((image): image is string => Boolean(image))),
     );
@@ -101,9 +89,9 @@ export function channelOffers(products: Product[], origin: string): ChannelOffer
       .map((image) => absoluteUrl(origin, image));
 
     return sizes.map((size) => ({
-      id: size ? `${product.id}-${sizeSlug(size)}` : product.id,
+      id: size && !openSize ? `${product.id}-${sizeSlug(size)}` : product.id,
       itemGroupId: hasVariants ? product.id : undefined,
-      title: cleanText(size ? `${product.title} — ${size}` : product.title, 150),
+      title: cleanText(size && !openSize ? `${product.title} — ${size}` : product.title, 150),
       description: cleanText(product.short, 5000),
       link: absoluteUrl(origin, `/product/${product.handle}`),
       imageLink,

@@ -1,4 +1,5 @@
 import type { Product } from "./product-types";
+import { catalogImageUrls } from "./catalog-images";
 import { products as bundledProducts } from "./products";
 
 type ProductRow = {
@@ -24,13 +25,9 @@ type ProductRow = {
   identifier_exists: boolean;
 };
 
-function publicImageUrl(imageFile?: string | null) {
-  if (!imageFile) return undefined;
-  const base = process.env.NEXT_PUBLIC_PRODUCT_IMAGE_BASE_URL?.replace(/\/$/, "");
-  return base ? `${base}/${encodeURIComponent(imageFile)}` : undefined;
-}
-
 function rowToProduct(row: ProductRow): Product {
+  const images = catalogImageUrls(row.id, row.image_file, row.image_url);
+
   return {
     id: row.id,
     handle: row.handle,
@@ -43,7 +40,8 @@ function rowToProduct(row: ProductRow): Product {
     colors: row.colors,
     short: row.short_description,
     imageFile: row.image_file || undefined,
-    image: row.image_url || publicImageUrl(row.image_file),
+    image: images[0],
+    images: images.length ? images : undefined,
     sizes: row.sizes || undefined,
     availability: row.availability,
     verified: row.verified,

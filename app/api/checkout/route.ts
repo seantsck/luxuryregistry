@@ -40,6 +40,11 @@ export async function GET(request: NextRequest) {
         { status: 400 },
       );
     }
+  } else if (product.department !== "Bags" && !size) {
+    return NextResponse.json(
+      { error: "Enter your requested size before checkout." },
+      { status: 400 },
+    );
   }
 
   try {

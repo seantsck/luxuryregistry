@@ -21,3 +21,12 @@ Do not mark a product `verified` or `channel_ready` based only on supplier image
 Verification should be supported by supplier documentation appropriate to the product and brand.
 
 Google feed items include up to ten additional product/gallery images when available.
+
+
+## Commercial rules confirmed September 25, 2026
+
+- Supplier catalog approval is treated as the internal product verification state.
+- Products with no fixed size array are sold with open size entry because the supplier confirmed all sizes are available.
+- Products with no defensible comparable / compare-at value use a $99 selling price and no fabricated compare-at price.
+- Legacy catalog wording such as "unverified", "supplier-presented", and "verification required" is normalized for supplier-approved products.
+- Supplier approval is an internal catalog state; it is not presented as independent third-party authentication.

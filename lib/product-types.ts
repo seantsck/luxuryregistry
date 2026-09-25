@@ -10,6 +10,7 @@ export type Product = {
   colors: string;
   short: string;
   image?: string;
+  images?: string[];
   imageFile?: string;
   sizes?: string[];
   gender?: "unisex" | "male" | "female";

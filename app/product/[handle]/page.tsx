@@ -7,6 +7,28 @@ import { siteUrl } from "@/lib/site";
 
 type Props = { params: Promise<{ handle: string }> };
 
+async function existingProductImages(images: string[]) {
+  if (images.length <= 1) return images;
+
+  const checked = await Promise.all(
+    images.map(async (image, index) => {
+      if (index === 0) return image;
+
+      try {
+        const response = await fetch(image, {
+          method: "HEAD",
+          next: { revalidate: 300 },
+        });
+        return response.ok ? image : undefined;
+      } catch {
+        return undefined;
+      }
+    }),
+  );
+
+  return checked.filter((image): image is string => Boolean(image));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
   const products = await loadCatalog();
@@ -23,6 +45,8 @@ export default async function ProductPage({ params }: Props) {
   const index = products.findIndex((p) => p.handle === handle);
   const previous = products[index - 1];
   const next = products[index + 1];
+  const imageCandidates = product.images?.length ? product.images : product.image ? [product.image] : [];
+  const productImages = await existingProductImages(imageCandidates);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -30,7 +54,7 @@ export default async function ProductPage({ params }: Props) {
     sku: product.id,
     name: product.title,
     description: product.short,
-    image: product.image ? [product.image] : undefined,
+    image: productImages.length ? productImages : undefined,
     brand: { "@type": "Brand", name: product.brand },
     offers: {
       "@type": "Offer",
@@ -54,17 +78,22 @@ export default async function ProductPage({ params }: Props) {
       </div>
 
       <div className="product-layout">
-        <div className={"product-detail-image dept-" + product.department.toLowerCase()}>
-          {product.image ? (
-            <img
-              src={product.image}
-              alt={product.title}
-              style={{ width:"100%", height:"100%", objectFit:"contain", display:"block", padding:"28px" }}
-            />
-          ) : (
-            <>
+        <div className="product-detail-gallery">
+          {productImages.length ? productImages.map((image, imageIndex) => (
+            <div
+              key={image}
+              className={"product-detail-image dept-" + product.department.toLowerCase()}
+            >
+              <img
+                src={image}
+                alt={imageIndex === 0 ? product.title : `${product.title} — view ${imageIndex + 1}`}
+                style={{ width:"100%", height:"100%", objectFit:"contain", display:"block", padding:"28px" }}
+              />
+            </div>
+          )) : (
+            <div className={"product-detail-image dept-" + product.department.toLowerCase()}>
               <span>{product.id}</span><strong>LR</strong><small>{product.department}</small>
-            </>
+            </div>
           )}
         </div>
 

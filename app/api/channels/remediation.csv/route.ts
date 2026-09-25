@@ -1,5 +1,5 @@
 import { loadCatalog } from "@/lib/catalog";
-import { channelIssues, csvCell, needsBrandReview } from "@/lib/channels";
+import { channelIssues, csvCell } from "@/lib/channels";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export async function GET() {
     "identifier_exists",
     "verified",
     "channel_ready",
-    "brand_review_required",
+    "all_sizes_available",
     "current_blockers",
     "supplier_verified",
     "confirmed_sizes",
@@ -46,10 +46,10 @@ export async function GET() {
     product.identifierExists === undefined ? "" : product.identifierExists ? "yes" : "no",
     product.verified ? "yes" : "no",
     product.channelReady ? "yes" : "no",
-    needsBrandReview(product) ? "yes" : "no",
+    product.department !== "Bags" && (!product.sizes || product.sizes.length === 0) ? "yes" : "no",
     channelIssues(product).join("|"),
-    "",
-    "",
+    product.verified ? "yes" : "no",
+    product.sizes?.join("|") || (product.department !== "Bags" ? "ALL SIZES" : ""),
     "",
     "",
     "",

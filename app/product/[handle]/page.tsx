@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { loadCatalog } from "@/lib/catalog";
 import { money } from "@/lib/format";
 import { siteUrl } from "@/lib/site";
+import { DEFAULT_STOCK_PER_SIZE, defaultSizesForProduct } from "@/lib/sizing";
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -47,6 +48,8 @@ export default async function ProductPage({ params }: Props) {
   const next = products[index + 1];
   const imageCandidates = product.images?.length ? product.images : product.image ? [product.image] : [];
   const productImages = await existingProductImages(imageCandidates);
+  const resolvedSizes = defaultSizesForProduct(product);
+  const stockPerSize = product.stockPerSize ?? DEFAULT_STOCK_PER_SIZE;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -114,31 +117,22 @@ export default async function ProductPage({ params }: Props) {
 
           <form action="/api/checkout" method="GET">
             <input type="hidden" name="product" value={product.id} />
-            {product.sizes?.length ? (
+            {resolvedSizes.length ? (
               <label style={{ display:"grid", gap:8, marginBottom:14 }}>
                 <span className="eyebrow">SIZE</span>
                 <select name="size" required defaultValue="">
                   <option value="" disabled>Select size</option>
-                  {product.sizes.map((size) => <option key={size} value={size}>{size}</option>)}
+                  {resolvedSizes.map((size) => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
                 </select>
-              </label>
-            ) : product.department !== "Bags" ? (
-              <label style={{ display:"grid", gap:8, marginBottom:14 }}>
-                <span className="eyebrow">SIZE</span>
-                <input
-                  name="size"
-                  required
-                  placeholder="Enter requested size"
-                  aria-label="Requested size"
-                  style={{ minHeight:44, padding:"0 12px" }}
-                />
-                <small style={{ opacity:.65 }}>All sizes available — enter the size you want.</small>
+                <small style={{ opacity:.65 }}>{stockPerSize} available per size.</small>
               </label>
             ) : null}
             <label style={{ display:"grid", gap:8, marginBottom:14 }}>
               <span className="eyebrow">QUANTITY</span>
               <select name="quantity" defaultValue="1">
-                {[1,2,3,4,5,6,7,8,9,10].map((quantity) => (
+                {Array.from({ length: resolvedSizes.length ? stockPerSize : 10 }, (_, index) => index + 1).map((quantity) => (
                   <option key={quantity} value={quantity}>{quantity}</option>
                 ))}
               </select>

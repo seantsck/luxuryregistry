@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
     missingCompareAt: products.filter(
       (product) => !product.compareAt || product.compareAt <= product.price,
     ).length,
-    openSizeProducts: products.filter(
-      (product) => product.department !== "Bags" && (!product.sizes || product.sizes.length === 0),
+    defaultSizedProducts: products.filter(
+      (product) => product.department !== "Bags",
     ).length,
     defaultPrice99: products.filter(
       (product) => product.price === 99 && !product.compareAt,
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     nextActions: [
       { key: "verification", count: issueCounts["verification-pending"] ?? 0 },
       { key: "publish-switch", count: issueCounts["channel-disabled"] ?? 0 },
-      { key: "open-size-entry", count: products.filter((product) => product.department !== "Bags" && (!product.sizes || product.sizes.length === 0)).length },
+      { key: "default-size-stock", count: products.filter((product) => product.department !== "Bags").length },
       { key: "default-price-99", count: products.filter((product) => product.price === 99 && !product.compareAt).length },
     ],
     ...(includeDetails ? { blocked } : {}),

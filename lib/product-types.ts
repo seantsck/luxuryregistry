@@ -13,6 +13,7 @@ export type Product = {
   images?: string[];
   imageFile?: string;
   sizes?: string[];
+  stockPerSize?: number;
   gender?: "unisex" | "male" | "female";
   availability?: "in stock" | "out of stock" | "preorder";
   verified?: boolean;

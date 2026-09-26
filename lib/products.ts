@@ -1,4 +1,5 @@
 import type { Product } from "./product-types";
+import { DEFAULT_STOCK_PER_SIZE, defaultSizesForProduct } from "./sizing";
 
 const imageBase = process.env.NEXT_PUBLIC_PRODUCT_IMAGE_BASE_URL?.replace(/\/$/, "");
 
@@ -28,7 +29,7 @@ function applySupplierApprovedRules(product: Product): Product {
     Number.isFinite(product.compareAt) &&
     product.compareAt > product.price;
 
-  return {
+  const normalized = {
     ...product,
     brand: cleanSupplierApprovedBrand(product.brand),
     price: hasComparable ? product.price : 99,
@@ -36,6 +37,11 @@ function applySupplierApprovedRules(product: Product): Product {
     verified: true,
     channelReady: true,
     buyable: true,
+  };
+  return {
+    ...normalized,
+    sizes: defaultSizesForProduct(normalized),
+    stockPerSize: DEFAULT_STOCK_PER_SIZE,
   };
 }
 

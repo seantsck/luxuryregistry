@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadCatalog } from "@/lib/catalog";
 import { createStripeCheckoutSession } from "@/lib/stripe";
+import { DEFAULT_STOCK_PER_SIZE, defaultSizesForProduct } from "@/lib/sizing";
 
 export const dynamic = "force-dynamic";
 
@@ -33,16 +34,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (product.sizes?.length) {
-    if (!size || !product.sizes.includes(size)) {
-      return NextResponse.json(
-        { error: "Choose a valid size before checkout." },
-        { status: 400 },
-      );
-    }
-  } else if (product.department !== "Bags" && !size) {
+  const resolvedSizes = defaultSizesForProduct(product);
+  if (resolvedSizes.length && (!size || !resolvedSizes.includes(size))) {
     return NextResponse.json(
-      { error: "Enter your requested size before checkout." },
+      { error: "Choose a valid size before checkout." },
+      { status: 400 },
+    );
+  }
+
+  const stockPerSize = product.stockPerSize ?? DEFAULT_STOCK_PER_SIZE;
+  if (resolvedSizes.length && quantity > stockPerSize) {
+    return NextResponse.json(
+      { error: `Maximum quantity for a size is ${stockPerSize}.` },
       { status: 400 },
     );
   }

@@ -1,4 +1,5 @@
 import type { Product } from "./product-types";
+import { DEFAULT_STOCK_PER_SIZE, defaultSizesForProduct } from "./sizing";
 
 export type ChannelIssue =
   | "verification-pending"
@@ -29,6 +30,7 @@ export type ChannelOffer = {
   mpn?: string;
   identifierExists: boolean;
   productType: string;
+  stockQuantity: number;
 };
 
 export function channelIssues(product: Product): ChannelIssue[] {
@@ -77,9 +79,9 @@ export function channelOffers(products: Product[], origin: string): ChannelOffer
   return products.flatMap((product) => {
     if (!isChannelReady(product)) return [];
 
-    const openSize = product.department !== "Bags" && (!product.sizes || product.sizes.length === 0);
-    const sizes = product.sizes?.length ? product.sizes : openSize ? ["All Sizes"] : [undefined];
-    const hasVariants = Boolean(product.sizes && product.sizes.length > 1);
+    const resolvedSizes = defaultSizesForProduct(product);
+    const sizes = resolvedSizes.length ? resolvedSizes : [undefined];
+    const hasVariants = resolvedSizes.length > 1;
     const imageCandidates = Array.from(
       new Set([product.image, ...(product.images ?? [])].filter((image): image is string => Boolean(image))),
     );
@@ -89,9 +91,9 @@ export function channelOffers(products: Product[], origin: string): ChannelOffer
       .map((image) => absoluteUrl(origin, image));
 
     return sizes.map((size) => ({
-      id: size && !openSize ? `${product.id}-${sizeSlug(size)}` : product.id,
+      id: size ? `${product.id}-${sizeSlug(size)}` : product.id,
       itemGroupId: hasVariants ? product.id : undefined,
-      title: cleanText(size && !openSize ? `${product.title} — ${size}` : product.title, 150),
+      title: cleanText(size ? `${product.title} — ${size}` : product.title, 150),
       description: cleanText(product.short, 5000),
       link: absoluteUrl(origin, `/product/${product.handle}`),
       imageLink,
@@ -110,6 +112,7 @@ export function channelOffers(products: Product[], origin: string): ChannelOffer
         product.identifierExists ??
         Boolean(product.gtin || product.mpn),
       productType: product.type,
+      stockQuantity: product.stockPerSize ?? DEFAULT_STOCK_PER_SIZE,
     }));
   });
 }

@@ -29,7 +29,7 @@ export default async function ChannelReadinessPage() {
 
   const quality = [
     ["Supplier-approved products", products.filter((p) => p.verified).length],
-    ["Open size-entry products", products.filter((p) => p.department !== "Bags" && (!p.sizes || !p.sizes.length)).length],
+    ["Products using standard size stock", products.filter((p) => p.department !== "Bags").length],
     ["$99 default-price products", products.filter((p) => p.price === 99 && !p.compareAt).length],
     ["Descriptions under 80 chars", products.filter((p) => p.short.trim().length < 80).length],
   ] as const;
@@ -42,8 +42,8 @@ export default async function ChannelReadinessPage() {
       </h1>
       <p style={{ maxWidth: 780, fontSize: 18, lineHeight: 1.6, opacity: .72 }}>
         The supplier-approved catalog can publish once required imagery, pricing, color,
-        identifier status, and the final channel switch are present. Products without a
-        fixed size array use open size entry because the supplier has confirmed all sizes.
+        identifier status, and the final channel switch are present. Standard size variants
+        are generated automatically with five units available per size.
       </p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 12, margin: "42px 0" }}>
